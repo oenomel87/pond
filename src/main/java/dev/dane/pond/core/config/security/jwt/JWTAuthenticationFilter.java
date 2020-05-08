@@ -1,6 +1,5 @@
 package dev.dane.pond.core.config.security.jwt;
 
-import dev.dane.pond.user.domain.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -38,14 +37,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+        String username = (String) authentication.getPrincipal();
         var signingKey = JWTConstants.JWT_SECRET.getBytes();
         var token = Jwts.builder()
                 .signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
                 .setHeaderParam("typ", JWTConstants.TOKEN_TYPE)
                 .setIssuer(JWTConstants.TOKEN_ISSUER)
                 .setAudience(JWTConstants.TOKEN_AUDIENCE)
-                .setSubject(user.getUsername())
+                .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + 864000000))
                 .compact();
         response.addHeader(JWTConstants.TOKEN_HEADER, JWTConstants.TOKEN_PREFIX + token);
